@@ -1,13 +1,12 @@
+const uuidv4 = require("uuidv4");
+
 const express = require("express");
 
 const app = express();
 
 app.use(express.json());
 
-const projects = [
-  { id: 1, title: "Projeto com react" },
-  { id: 2, title: "Projeto com vue" },
-];
+const projects = [];
 
 function logRequests(req, res, next) {
   const { method, url } = req;
@@ -23,6 +22,11 @@ function logRequests(req, res, next) {
 
 function validateProjectId(req, res, next) {
   const { id } = req.params;
+
+  if (!uuidv4.isUuid(id)) {
+    return res.status(400).json({ message: "Project uuid is not valid" });
+  }
+
   const projectIndex = findProject(id);
 
   if (projectIndex < 0) {
@@ -37,8 +41,7 @@ function validateProjectId(req, res, next) {
 app.use(logRequests);
 app.use("/projects/:id", validateProjectId);
 
-const findProject = (id) =>
-  projects.findIndex((project) => project && project.id === parseInt(id));
+const findProject = (id) => projects.findIndex((project) => project && project.id === id);
 
 app.get("/projects", (req, res) => {
   const { title } = req.query;
@@ -54,7 +57,7 @@ app.post("/projects", (req, res) => {
   const { title } = req.body;
 
   const project = {
-    id: projects.length + 1,
+    id: uuidv4.uuid(),
     title,
   };
 
@@ -75,7 +78,7 @@ app.put("/projects/:id", (req, res) => {
 app.delete("/projects/:id", (req, res) => {
   const projectIndex = req.body.$projectIndex;
 
-  delete projects[projectIndex];
+  projects.splice(projectIndex, 1);
 
   return res.status(204).send();
 });

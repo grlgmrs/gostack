@@ -54,11 +54,12 @@ app.get("/projects", (req, res) => {
 });
 
 app.post("/projects", (req, res) => {
-  const { title } = req.body;
+  const { title, owner } = req.body;
 
   const project = {
     id: uuidv4.uuid(),
     title,
+    owner,
   };
 
   projects.push(project);
@@ -67,12 +68,18 @@ app.post("/projects", (req, res) => {
 });
 
 app.put("/projects/:id", (req, res) => {
-  const { title } = req.body;
+  const { title, owner } = req.body;
   const projectIndex = req.body.$projectIndex;
 
-  projects[projectIndex].title = title;
+  const project = {
+    ...projects[projectIndex],
+    title,
+    owner,
+  };
 
-  return res.json(projects[projectIndex]);
+  projects[projectIndex] = project;
+
+  return res.json(project);
 });
 
 app.delete("/projects/:id", (req, res) => {

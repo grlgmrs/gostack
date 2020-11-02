@@ -1,11 +1,8 @@
 import { Router } from "express";
+import appointmentsRouter from "./appointments.routes";
 
-const router = Router();
+const routes = Router();
 
-router.get("/", (req, res) => {
-  const message = "Hello World from separated routes file!";
+routes.use("/appointments", appointmentsRouter);
 
-  return res.send(message);
-});
-
-export default router;
+export default routes;
